@@ -16,11 +16,11 @@ const config = {
           'mui-tiptap',
           'recharts',
           '@react-pdf/renderer',
+          'lodash',
         ],
     webpackMemoryOptimizations: true,
     preloadEntriesOnStart: false,
     turbopackFileSystemCacheForDev: false,
-    turbopackMemoryLimit: 4096,
   },
   images: {
     unoptimized: true,
