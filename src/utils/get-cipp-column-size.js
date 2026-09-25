@@ -15,8 +15,13 @@ export const getCippColumnSize = (accessorKey, header) => {
   switch (accessorKey) {
     case 'alignmentScore':
     case 'combinedAlignmentScore':
+    case 'compliancePercentage':
+    case 'complianceScore':
     case 'LicenseMissingPercentage':
     case 'ScorePercentage':
+    case 'percentOfTenant':
+    case 'percentOfSite':
+    case 'percentUsed':
       return { size: 250, minSize: 250 }
 
     // Columns that render as small icons or compact elements
