@@ -15,17 +15,26 @@ jobs:
     steps:
       - name: Merge upstream into fork
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The default GITHUB_TOKEN cannot push commits that touch .github/workflows,
+          # which upstream changes regularly. UPSTREAM_SYNC_TOKEN must be a PAT with
+          # Contents + Workflows write (fine-grained) or repo + workflow scopes (classic).
+          GH_TOKEN: ${{ secrets.UPSTREAM_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+          HAS_SYNC_TOKEN: ${{ secrets.UPSTREAM_SYNC_TOKEN != '' }}
         run: |
+          if [ "$HAS_SYNC_TOKEN" != "true" ]; then
+            echo "::warning::UPSTREAM_SYNC_TOKEN is not set; the sync will fail whenever upstream changes a workflow file."
+          fi
           gh api -X POST repos/${{ github.repository }}/merge-upstream \
-            -f branch=${{ github.ref_name }}
+            -f branch=${{ github.event.repository.default_branch }}
 
       - name: Open issue on failure
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
+          gh label create automation --color ededed --description "Raised by automation" 2>/dev/null || true
           gh issue create \
             --title "Auto-sync from upstream failed - $(date -u +%Y-%m-%d)" \
-            --body "The weekly upstream sync failed. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Common causes: a real merge conflict (apply Section 3 of CIPP System/updating-versions.md manually) or upstream changed a workflow file (default GITHUB_TOKEN cannot push those — manual sync required this week)." \
+            --body "The weekly upstream sync failed. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Common causes: a real merge conflict (apply Section 3 of CIPP System/updating-versions.md manually), or the UPSTREAM_SYNC_TOKEN secret is missing or expired (upstream changed a workflow file, which GITHUB_TOKEN cannot push)." \
             --label automation
