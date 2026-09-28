@@ -1,3 +1,6 @@
+> [!WARNING]
+> **Dormant fork.** Novix IT no longer deploys CIPP from this repository. See [DORMANT.md](DORMANT.md).
+
 ![CyberDrain Light](github_assets/img/CIPP.png#gh-dark-mode-only)
 ![CyberDrain Dark](github_assets/img/CIPP-Light.png#gh-light-mode-only)
 
